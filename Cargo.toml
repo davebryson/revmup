@@ -1,0 +1,12 @@
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = [
+ "revmup-contract", 
+ "revmup-client",
+ "revmup-gen",
+ "examples/*",
+]
+

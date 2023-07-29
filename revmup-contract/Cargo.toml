@@ -1,0 +1,13 @@
+[package]
+name = "revmup-contract"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+anyhow = "1.0.72"
+ethers = "2.0.8"
+hex = "0.4"
+hex-literal = "0.4"
+revm = "3.3.0"
+revmup-client = {path="../revmup-client"}

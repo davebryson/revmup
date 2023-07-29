@@ -1,0 +1,11 @@
+[package]
+name = "revmup-client"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+anyhow = "1.0.72"
+ethers = "2.0.8"
+revm = "3.3.0"
+rand = "0.8.5"
