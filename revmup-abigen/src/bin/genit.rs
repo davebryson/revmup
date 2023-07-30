@@ -1,5 +1,5 @@
 fn gen_it(name: &str, rawabi: &str, filename: &str) {
-    let abigen = revmup_gen::Abigen::new(name, rawabi).unwrap();
+    let abigen = revmup_abigen::Abigen::new(name, rawabi).unwrap();
     let gen = abigen.generate().unwrap();
     gen.write_to_file(format!("./examples/basics/src/{}.rs", filename))
         .expect("write to file");

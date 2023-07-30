@@ -6,7 +6,7 @@ edition = "2021"
 members = [
  "revmup-contract", 
  "revmup-client",
- "revmup-gen",
+ "revmup-abigen",
  "examples/*",
 ]
 

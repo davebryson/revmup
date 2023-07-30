@@ -1,5 +1,5 @@
 [package]
-name = "revmup-gen"
+name = "revmup-abigen"
 version = "0.1.0"
 edition = "2021"
 
