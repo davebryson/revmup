@@ -1,7 +1,9 @@
 use rand::Rng;
 use revm::{
     db::{CacheDB, EmptyDB},
-    primitives::{AccountInfo, ExecutionResult, Log, Output, ResultAndState, TxEnv, U256},
+    primitives::{
+        AccountInfo, ExecutionResult, Log, Output, ResultAndState, TransactTo, TxEnv, U256,
+    },
     Database, EVM,
 };
 use std::cell::RefCell;
@@ -13,7 +15,7 @@ pub fn generate_random_account() -> ::revm::primitives::Address {
     ::revm::primitives::Address::from(random_bytes)
 }
 
-/// Simple Client for testing
+/// Basic implementation of a revm client
 pub struct BasicClient {
     evm: RefCell<EVM<CacheDB<EmptyDB>>>,
 }
@@ -30,6 +32,7 @@ impl BasicClient {
     }
 }
 
+// convert revm Logs to ethers RawLog
 fn into_ether_raw_log(logs: Vec<Log>) -> Vec<::ethers::abi::RawLog> {
     logs.iter()
         .map(|log| {
@@ -84,6 +87,27 @@ impl RevmClient for BasicClient {
         }
     }
 
+    fn transfer(
+        &self,
+        to: ::ethers::types::Address,
+        from: ::ethers::types::Address,
+        amount: ::ethers::types::U256,
+    ) -> eyre::Result<()> {
+        let mut tx = TxEnv::default();
+        tx.caller = from.into();
+        tx.transact_to = TransactTo::Call(to.into());
+        tx.value = amount.into();
+        self.evm.borrow_mut().env.tx = tx;
+        let (_, _, _) = self
+            .evm
+            .borrow_mut()
+            .transact_commit()
+            .map_err(|e| eyre::eyre!("error on transact: {:?}", e))
+            .and_then(|r| process_execution_result(r))?;
+
+        Ok(())
+    }
+
     fn deploy(&self, tx: TxEnv) -> eyre::Result<ethers::abi::Address> {
         self.evm.borrow_mut().env.tx = tx;
         let (output, _, _) = self
@@ -99,6 +123,7 @@ impl RevmClient for BasicClient {
         }
     }
 
+    // This is invoked in contract::call:FunctionCall
     fn call(&self, tx: TxEnv) -> eyre::Result<revm::primitives::Bytes> {
         self.evm.borrow_mut().env.tx = tx;
         match self.evm.borrow_mut().transact_ref() {
@@ -111,7 +136,6 @@ impl RevmClient for BasicClient {
     }
 
     /// This is invoked in contract::call:FunctionCall
-    /// returns gas used (for now)
     fn send_transaction(
         &self,
         tx: TxEnv,
@@ -128,6 +152,7 @@ impl RevmClient for BasicClient {
     }
 }
 
+/// helper to extract results
 fn process_execution_result(result: ExecutionResult) -> eyre::Result<(Output, u64, Vec<Log>)> {
     match result {
         ExecutionResult::Success {

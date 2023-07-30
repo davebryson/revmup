@@ -45,6 +45,7 @@ let (_, logs) = erc.transfer(alice.into(), 1u8.into()).send_transaction(bob).unw
  let log_results = erc.get_transfer_filter_logs(logs.clone()).expect("parse log");
 println!("transfer events: {:?}", log_results);
 ```
-
+## Run the example
+`cargo run --bin basics`
 
 
