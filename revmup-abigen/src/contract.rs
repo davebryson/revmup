@@ -68,7 +68,8 @@ impl ExpandedContract {
         quote! {
             pub use #module::*;
 
-            /// This module was auto-generated from a customized version ethers-rs Abigen.
+            /// This module was auto-generated from a customized version of ethers-rs Abigen.
+            /// In this version, ethers::provider is replaced with a revm client.
             #[allow(
                 clippy::enum_variant_names,
                 clippy::too_many_arguments,
