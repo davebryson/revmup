@@ -5,7 +5,7 @@ edition = "2021"
 
 
 [dependencies]
-anyhow = "1.0.72"
+eyre = "0.6.8"
 ethers = "2.0.8"
 revm = "3.3.0"
 rand = "0.8.5"

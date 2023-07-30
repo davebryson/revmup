@@ -3,7 +3,7 @@
 use super::{structs::expand_event_struct, types, Context};
 use crate::util;
 use ethers::abi::{Event, EventExt};
-use ethers::prelude::macros::{ethers_contract_crate, ethers_core_crate};
+use ethers::prelude::macros::ethers_contract_crate;
 use eyre::Result;
 use inflector::Inflector;
 use proc_macro2::{Ident, TokenStream};
@@ -35,6 +35,7 @@ impl Context {
     }
 
     /// Generate the event filter methods for the contract
+    /// @note REMOVE NOT USED
     pub fn event_methods(&self) -> Result<TokenStream> {
         let sorted_events: BTreeMap<_, _> = self.abi.events.iter().collect();
         let filter_methods = sorted_events
@@ -75,8 +76,27 @@ impl Context {
             .map(|param| &param.kind);
         util::derive_builtin_traits(params, &mut derives, false, true);
 
-        let ethers_core = ethers_core_crate();
+        //let ethers_core = ethers_core_crate();
         let ethers_contract = ethers_contract_crate();
+
+        let quoted_names_str = self
+            .abi
+            .events
+            .values()
+            .flatten()
+            .map(|e| {
+                let ident = event_struct_alias(&e.name);
+                ident.to_string()
+            })
+            .collect::<Vec<String>>();
+
+        let event_method_names = variants
+            .iter()
+            .map(|item| {
+                let r = format!("get_{}_logs", &item.to_string().to_snake_case());
+                util::ident(&r)
+            })
+            .collect::<Vec<Ident>>();
 
         quote! {
             #[doc = "Container type for all of the contract's events"]
@@ -85,6 +105,24 @@ impl Context {
                 #( #variants(#variants), )*
             }
 
+            impl<M: ::revmup_client::RevmClient> MockErc20<M> {
+                #(
+                    pub fn #event_method_names(&self, logs: Vec<::ethers::abi::RawLog>) -> eyre::Result<Vec<#variants>> {
+                        let e = self.abi().event(#quoted_names_str)?;
+                        let results = logs.iter()
+                            .flat_map(|log| {
+                                self.0.decode_event::<#variants>(
+                                    &e.name,
+                                    log.topics.clone(),
+                                    log.data.clone().into()
+                                ).map_err(|e| eyre::eyre!("error decoding event: {}", e)).ok()
+                        }).collect::<Vec<_>>();
+                        Ok(results)
+                    }
+                )*
+            }
+
+            /*
             impl #ethers_contract::EthLogDecode for #enum_name {
                 fn decode_log(log: &#ethers_core::abi::RawLog) -> ::core::result::Result<Self, #ethers_core::abi::Error> {
                     #(
@@ -105,6 +143,7 @@ impl Context {
                     }
                 }
             }
+            */
 
             #(
                 impl ::core::convert::From<#variants> for #enum_name {

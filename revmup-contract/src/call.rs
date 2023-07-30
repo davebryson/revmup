@@ -26,7 +26,7 @@ where
     R: RevmClient,
     D: Detokenize,
 {
-    pub fn call(&self) -> anyhow::Result<D> {
+    pub fn call(&self) -> eyre::Result<D> {
         let bits = self.client.borrow().call(self.tx.clone())?;
         let data = decode_function_data(&self.function, &bits, false)?;
         Ok(data)
@@ -34,12 +34,14 @@ where
 
     pub fn send_transaction(
         &self,
-        caller: ::revm::primitives::Address,
-    ) -> anyhow::Result<Vec<::revm::primitives::Log>> {
+        caller: ::ethers::types::Address,
+    ) -> eyre::Result<(D, Vec<::ethers::abi::RawLog>)> {
         let mut t = self.tx.to_owned();
-        t.caller = caller;
-        let (_, _, logs) = self.client.borrow().send_transaction(t)?;
-        Ok(logs)
+        t.caller = caller.into();
+        let (bits, _, logs) = self.client.borrow().send_transaction(t)?;
+        let data = decode_function_data(&self.function, &bits, false)?;
+        //let rl =
+        Ok((data, logs))
     }
 }
 

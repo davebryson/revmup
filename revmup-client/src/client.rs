@@ -1,9 +1,8 @@
-use anyhow::bail;
 use rand::Rng;
 use revm::{
     db::{CacheDB, EmptyDB},
     primitives::{AccountInfo, ExecutionResult, Log, Output, ResultAndState, TxEnv, U256},
-    EVM,
+    Database, EVM,
 };
 use std::cell::RefCell;
 
@@ -31,48 +30,83 @@ impl BasicClient {
     }
 }
 
+fn into_ether_raw_log(logs: Vec<Log>) -> Vec<::ethers::abi::RawLog> {
+    logs.iter()
+        .map(|log| {
+            let topics: Vec<::ethers::types::H256> =
+                log.topics.iter().map(|x| x.clone().into()).collect();
+            ::ethers::abi::RawLog {
+                topics,
+                data: log.clone().data.into(),
+            }
+        })
+        .collect()
+}
+
 impl RevmClient for BasicClient {
-    fn create_account(
+    fn create_account_with_balance(
         &self,
-        bal: Option<::revm::primitives::U256>,
-    ) -> anyhow::Result<::revm::primitives::Address> {
+        amount: ::ethers::types::U256,
+    ) -> eyre::Result<::ethers::types::Address> {
         let account = generate_random_account();
         let mut info = AccountInfo::default();
-        if bal.is_some() {
-            info.balance = bal.unwrap();
-        }
-
+        info.balance = amount.into();
         self.evm
             .borrow_mut()
             .db()
             .and_then(|db| Some(db.insert_account_info(account, info)));
 
-        Ok(account)
+        Ok(account.into())
     }
 
-    fn deploy(&self, tx: TxEnv) -> anyhow::Result<ethers::abi::Address> {
+    fn batch_create_accounts_with_balance(
+        &self,
+        num: u64,
+        amount: ::ethers::types::U256,
+    ) -> eyre::Result<Vec<::ethers::types::Address>> {
+        let r = (0..num)
+            .into_iter()
+            .flat_map(|_| self.create_account_with_balance(amount).ok())
+            .collect();
+        Ok(r)
+    }
+
+    fn get_balance(&self, account: ::ethers::types::Address) -> ::ethers::types::U256 {
+        match self
+            .evm
+            .borrow_mut()
+            .db()
+            .expect("evm db")
+            .basic(account.into())
+        {
+            Ok(Some(account)) => account.balance.into(),
+            _ => ::ethers::types::U256::zero(),
+        }
+    }
+
+    fn deploy(&self, tx: TxEnv) -> eyre::Result<ethers::abi::Address> {
         self.evm.borrow_mut().env.tx = tx;
         let (output, _, _) = self
             .evm
             .borrow_mut()
             .transact_commit()
-            .map_err(|_| anyhow::anyhow!("error"))
+            .map_err(|e| eyre::eyre!("error on deploy: {:?}", e))
             .and_then(|r| process_execution_result(r))?;
 
         match output {
             Output::Create(_, Some(address)) => Ok(address.into()),
-            _ => bail!("expected a create call"),
+            _ => eyre::bail!("expected a create call"),
         }
     }
 
-    fn call(&self, tx: TxEnv) -> anyhow::Result<revm::primitives::Bytes> {
+    fn call(&self, tx: TxEnv) -> eyre::Result<revm::primitives::Bytes> {
         self.evm.borrow_mut().env.tx = tx;
         match self.evm.borrow_mut().transact_ref() {
             Ok(ResultAndState { result, .. }) => {
                 let (r, _, _) = process_result_with_value(result)?;
                 Ok(r)
             }
-            _ => bail!("error with read..."),
+            _ => eyre::bail!("error with read..."),
         }
     }
 
@@ -81,19 +115,20 @@ impl RevmClient for BasicClient {
     fn send_transaction(
         &self,
         tx: TxEnv,
-    ) -> anyhow::Result<(revm::primitives::Bytes, u64, Vec<Log>)> {
+    ) -> eyre::Result<(revm::primitives::Bytes, u64, Vec<::ethers::abi::RawLog>)> {
         self.evm.borrow_mut().env.tx = tx;
         match self.evm.borrow_mut().transact_commit() {
             Ok(result) => {
                 let (b, gas, logs) = process_result_with_value(result)?;
-                Ok((b, gas, logs))
+                let rlogs = into_ether_raw_log(logs);
+                Ok((b, gas, rlogs))
             }
-            _ => bail!("error with write..."),
+            _ => eyre::bail!("error with write..."),
         }
     }
 }
 
-fn process_execution_result(result: ExecutionResult) -> anyhow::Result<(Output, u64, Vec<Log>)> {
+fn process_execution_result(result: ExecutionResult) -> eyre::Result<(Output, u64, Vec<Log>)> {
     match result {
         ExecutionResult::Success {
             output,
@@ -101,18 +136,18 @@ fn process_execution_result(result: ExecutionResult) -> anyhow::Result<(Output, 
             logs,
             ..
         } => Ok((output, gas_used, logs)),
-        ExecutionResult::Revert { output, .. } => bail!("Failed due to revert: {:?}", output),
-        ExecutionResult::Halt { reason, .. } => bail!("Failed due to halt: {:?}", reason),
+        ExecutionResult::Revert { output, .. } => eyre::bail!("Failed due to revert: {:?}", output),
+        ExecutionResult::Halt { reason, .. } => eyre::bail!("Failed due to halt: {:?}", reason),
     }
 }
 
 fn process_result_with_value(
     result: ExecutionResult,
-) -> anyhow::Result<(revm::primitives::Bytes, u64, Vec<Log>)> {
+) -> eyre::Result<(revm::primitives::Bytes, u64, Vec<Log>)> {
     let (output, gas_used, logs) = process_execution_result(result)?;
     let bits = match output {
         Output::Call(value) => value,
-        _ => bail!("expected call output"),
+        _ => eyre::bail!("expected call output"),
     };
 
     Ok((bits, gas_used, logs))

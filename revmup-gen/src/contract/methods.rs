@@ -54,7 +54,6 @@ impl Context {
         self.contract_bytecode.as_ref()?;
 
         let ethers_core = ethers_core_crate();
-        //let ethers_contract = ethers_contract_crate();
 
         let abi_name = self.inline_abi_ident();
         let get_abi = quote! {
@@ -105,18 +104,18 @@ impl Context {
 
             pub fn deploy<T: #ethers_core::abi::Tokenize>(
                 client: ::std::sync::Arc<M>,
-                caller: ::revm::primitives::Address,
+                caller: ::ethers::abi::Address,
                 args: T
-            ) -> anyhow::Result<ethers::abi::Address> {
+            ) -> eyre::Result<::ethers::abi::Address> {
                 let params = args.into_tokens();
-                let abi = ethers::abi::Abi::from(#get_abi);
+                let abi = ::ethers::abi::Abi::from(#get_abi);
                 let encoded = match abi.constructor() {
                     Some(c) => c.encode_input(#get_bytecode.to_vec().into(), &params)?,
                     _ => #get_bytecode.to_vec().into(),
                 };
 
                 let mut tx = ::revm::primitives::TxEnv::default();
-                tx.caller = caller;
+                tx.caller = caller.into();
                 tx.transact_to = ::revm::primitives::TransactTo::create();
                 tx.data = encoded.into();
 

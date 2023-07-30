@@ -133,7 +133,7 @@ where
     }
     */
 
-    pub fn deploy(&self, tx: TxEnv) -> anyhow::Result<ethers::abi::Address> {
+    pub fn deploy(&self, tx: TxEnv) -> eyre::Result<ethers::abi::Address> {
         self.client.borrow().deploy(tx)
     }
 
