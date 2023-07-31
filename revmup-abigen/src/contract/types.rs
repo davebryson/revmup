@@ -1,8 +1,11 @@
 //! Types expansion
 
 use crate::{util, InternalStructs};
-use ethers::abi::{struct_def::StructFieldType, Event, EventParam, Param, ParamType};
-use ethers::prelude::macros::ethers_core_crate;
+
+use ethers_core::{
+    abi::{struct_def::StructFieldType, Event, EventParam, Param, ParamType},
+    macros::ethers_core_crate,
+};
 use eyre::{bail, Result};
 use inflector::Inflector;
 use proc_macro2::{Literal, TokenStream};

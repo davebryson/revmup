@@ -5,7 +5,7 @@ use revmup_client::RevmClient;
 
 fn main() {
     let client = ::std::sync::Arc::new(revmup_client::BasicClient::new());
-    let amt = ::ethers::core::utils::parse_ether(3u8).unwrap();
+    let amt = ::ethers_core::utils::parse_ether(3u8).unwrap();
 
     let accounts = client
         .batch_create_accounts_with_balance(2, amt)

@@ -57,31 +57,7 @@ where
     pub fn abi(&self) -> &Abi {
         &self.base_contract.abi()
     }
-
-    // Returns a pointer to the contract's client.
-    //pub fn client(&self) -> ::std::sync::Arc<C> {
-    //    self.client.clone()
-    //}
 }
-
-/*
-impl<C> ContractInstance<C>
-where
-    C: RevmClient,
-{
-    /// Returns an [`Event`](crate::builders::Event) builder for the provided event.
-    /// This function operates in a static context, then it does not require a `self`
-    /// to reference to instantiate an [`Event`](crate::builders::Event) builder.
-    pub fn event_of_type<D: EthEvent>(client: B) -> Event<B, M, D> {
-        Event {
-            provider: client,
-            filter: Filter::new().event(&D::abi_signature()),
-            datatype: PhantomData,
-            _m: PhantomData,
-        }
-    }
-}
-*/
 
 impl<B, R> ContractInstance<B, R>
 where
@@ -104,35 +80,6 @@ where
     B: Clone + Borrow<R>,
     R: RevmClient,
 {
-    // @todo CLEANUP
-    /// Returns an [`Event`](crate::builders::Event) builder with the provided filter.
-    /// REMOVE FOR NOW AS EVENT NEEDS MiddleWare
-    /*
-    pub fn event_with_filter<D>(&self, filter: Filter) -> Event<B, M, D> {
-        Event {
-            provider: self.client.clone(),
-            filter: filter.address(ValueOrArray::Value(self.address)),
-            datatype: PhantomData,
-            _m: PhantomData,
-        }
-    }
-
-    /// Returns an [`Event`](crate::builders::Event) builder for the provided event.
-    pub fn event<D: EthEvent>(&self) -> Event<B, M, D> {
-        D::new(Filter::new(), self.client.clone())
-    }
-
-    /// Returns an [`Event`](crate::builders::Event) builder with the provided name.
-    pub fn event_for_name<D>(&self, name: &str) -> Result<Event<B, M, D>, Error> {
-        // get the event's full name
-
-
-        // @todo EVENT-USE
-        let event = self.base_contract.abi().event(name)?;
-        Ok(self.event_with_filter(Filter::new().event(&event.abi_signature())))
-    }
-    */
-
     pub fn deploy(&self, tx: TxEnv) -> eyre::Result<Address> {
         self.client.borrow().deploy(tx)
     }

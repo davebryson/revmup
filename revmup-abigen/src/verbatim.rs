@@ -98,7 +98,7 @@ macro_rules! derive_verbatim {
     () => {};
 
     (struct $name:ident { $($field:ident),* $(,)? } $($rest:tt)*) => {
-        impl Verbatim for ethers::abi::ethabi::$name {
+        impl Verbatim for ethers_core::abi::ethabi::$name {
             #[allow(deprecated)]
             fn to_tokens(&self, s: &mut TokenStream, ethers_core: &Path) {
                 $(
@@ -115,7 +115,7 @@ macro_rules! derive_verbatim {
     };
 
     (enum $name:ident { $($variant:ident $(($($field:ident),* $(,)?))?),* $(,)? } $($rest:tt)*) => {
-        impl Verbatim for ethers::abi::ethabi::$name {
+        impl Verbatim for ethers_core::abi::ethabi::$name {
             #[allow(deprecated)]
             fn to_tokens(&self, s: &mut TokenStream, ethers_core: &Path) {
                 match self {$(

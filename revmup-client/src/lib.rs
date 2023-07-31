@@ -5,7 +5,6 @@ use ethers_core::{
 use revm::primitives::TxEnv;
 
 mod client;
-
 pub use self::client::BasicClient;
 
 pub trait RevmClient {

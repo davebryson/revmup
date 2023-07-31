@@ -1,8 +1,14 @@
 use crate::InternalStructs;
-use ethers::abi::{
+//use ethers::abi::{
+//    struct_def::{FieldType, StructFieldType},
+//    ParamType, SolStruct,
+//};
+
+use ethers_core::abi::{
     struct_def::{FieldType, StructFieldType},
     ParamType, SolStruct,
 };
+
 use eyre::Result;
 use inflector::Inflector;
 use proc_macro2::{Ident, Span, TokenStream};
@@ -152,7 +158,7 @@ fn take_while(s: &str, mut predicate: impl FnMut(char) -> bool) -> (&str, &str) 
         if predicate(c) {
             index += c.len_utf8();
         } else {
-            break
+            break;
         }
     }
     s.split_at(index)
@@ -164,7 +170,12 @@ pub(crate) fn json_files(root: impl AsRef<Path>) -> Vec<PathBuf> {
         .into_iter()
         .filter_map(Result::ok)
         .filter(|e| e.file_type().is_file())
-        .filter(|e| e.path().extension().map(|ext| ext == "json").unwrap_or_default())
+        .filter(|e| {
+            e.path()
+                .extension()
+                .map(|ext| ext == "json")
+                .unwrap_or_default()
+        })
         .map(|e| e.path().into())
         .collect()
 }
@@ -339,7 +350,11 @@ where
 
 /// Returns the Solidity stringified ABI types joined by a single comma.
 pub(crate) fn abi_signature_types<'a, T: IntoIterator<Item = &'a ParamType>>(types: T) -> String {
-    types.into_iter().map(ToString::to_string).collect::<Vec<_>>().join(",")
+    types
+        .into_iter()
+        .map(ToString::to_string)
+        .collect::<Vec<_>>()
+        .join(",")
 }
 
 #[cfg(test)]

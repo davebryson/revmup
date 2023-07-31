@@ -32,7 +32,9 @@ mod util;
 mod verbatim;
 //mod macro;
 
-pub use ethers::types::Address;
+//pub use ethers::types::Address;
+pub use ethers_core::types::Address;
+
 pub use source::Source;
 
 use contract::{Context, ExpandedContract};

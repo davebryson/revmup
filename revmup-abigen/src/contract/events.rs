@@ -2,8 +2,11 @@
 
 use super::{structs::expand_event_struct, types, Context};
 use crate::util;
-use ethers::abi::{Event, EventExt};
-use ethers::prelude::macros::ethers_contract_crate;
+
+use ethers_core::{
+    abi::{Event, EventExt},
+    macros::ethers_contract_crate,
+};
 use eyre::Result;
 use inflector::Inflector;
 use proc_macro2::{Ident, TokenStream};
@@ -34,24 +37,6 @@ impl Context {
         })
     }
 
-    /// Generate the event filter methods for the contract
-    /// @note REMOVE NOT USED
-    pub fn event_methods(&self) -> Result<TokenStream> {
-        let sorted_events: BTreeMap<_, _> = self.abi.events.iter().collect();
-        let filter_methods = sorted_events
-            .values()
-            .flat_map(std::ops::Deref::deref)
-            .map(|event| self.expand_filter(event));
-
-        let events_method = self.expand_events_method();
-
-        Ok(quote! {
-            #( #filter_methods )*
-
-            #events_method
-        })
-    }
-
     /// Generate an enum with a variant for each event
     fn expand_events_enum(&self) -> TokenStream {
         let variants = self
@@ -76,7 +61,6 @@ impl Context {
             .map(|param| &param.kind);
         util::derive_builtin_traits(params, &mut derives, false, true);
 
-        //let ethers_core = ethers_core_crate();
         let ethers_contract = ethers_contract_crate();
 
         let quoted_names_str = self
@@ -107,7 +91,7 @@ impl Context {
 
             impl<M: ::revmup_client::RevmClient> MockErc20<M> {
                 #(
-                    pub fn #event_method_names(&self, logs: Vec<::ethers::abi::RawLog>) -> eyre::Result<Vec<#variants>> {
+                    pub fn #event_method_names(&self, logs: Vec<::ethers_core::abi::RawLog>) -> eyre::Result<Vec<#variants>> {
                         let e = self.abi().event(#quoted_names_str)?;
                         let results = logs.iter()
                             .flat_map(|log| {
@@ -122,18 +106,6 @@ impl Context {
                 )*
             }
 
-            /*
-            impl #ethers_contract::EthLogDecode for #enum_name {
-                fn decode_log(log: &#ethers_core::abi::RawLog) -> ::core::result::Result<Self, #ethers_core::abi::Error> {
-                    #(
-                        if let Ok(decoded) = #variants::decode_log(log) {
-                            return Ok(#enum_name::#variants(decoded))
-                        }
-                    )*
-                    Err(#ethers_core::abi::Error::InvalidData)
-                }
-            }
-
             impl ::core::fmt::Display for #enum_name {
                 fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
                     match self {
@@ -143,7 +115,6 @@ impl Context {
                     }
                 }
             }
-            */
 
             #(
                 impl ::core::convert::From<#variants> for #enum_name {
@@ -161,6 +132,7 @@ impl Context {
     }
 
     /// Expands the `events` function that bundles all declared events of this contract
+    /// @todo REMOVE?
     fn expand_events_method(&self) -> Option<TokenStream> {
         let sorted_events: BTreeMap<_, _> = self.abi.events.clone().into_iter().collect();
 
@@ -193,6 +165,7 @@ impl Context {
     }
 
     /// Expands into a single method for contracting an event stream.
+    /// @todo REMOVE?
     fn expand_filter(&self, event: &Event) -> TokenStream {
         let name = &event.name;
         let sig = event.abi_signature();
@@ -275,7 +248,7 @@ pub(crate) fn event_struct_alias(event_name: &str) -> Ident {
 mod tests {
     use super::*;
     use crate::Abigen;
-    use ethers::abi::{EventParam, ParamType};
+    use ethers_core::abi::{EventParam, ParamType};
 
     fn test_context() -> Context {
         Context::from_abigen(Abigen::new("TestToken", "[]").unwrap()).unwrap()

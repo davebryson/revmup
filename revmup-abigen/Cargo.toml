@@ -7,16 +7,12 @@ edition = "2021"
 name = "generate"
 path = "src/bin/gencontracts.rs"
 
-#[[bin]]
-#name = "generate"
-#path = "src/bin/genit.rs"
-
 [dependencies]
 eyre.workspace = true
-ethers.workspace = true
+ethers-core.workspace = true
+ethers-contract.workspace = true
 hex.workspace = true
 revm.workspace = true
-
 
 serde = "1.0"
 serde_json = "1.0"

@@ -5,8 +5,8 @@ edition = "2021"
 
 
 [dependencies]
-ethers-core = "2.0.8"
-ethers-contract = "2.0.8"
+ethers-core.workspace = true
+ethers-contract.workspace = true
 eyre.workspace = true
 revm.workspace = true
 hex.workspace = true

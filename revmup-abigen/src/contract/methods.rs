@@ -2,9 +2,10 @@
 
 use super::{structs::expand_struct, types, Context};
 use crate::util;
-use ethers::prelude::macros::{ethers_contract_crate, ethers_core_crate};
-use ethers::{
+
+use ethers_core::{
     abi::{Function, FunctionExt, Param, ParamType},
+    macros::{ethers_contract_crate, ethers_core_crate},
     types::Selector,
 };
 use eyre::{Context as _, Result};
@@ -66,49 +67,17 @@ impl Context {
         };
 
         Some(quote! {
-            /// Constructs the general purpose `Deployer` instance based on the provided constructor arguments and sends it.
-            /// Returns a new instance of a deployer that returns an instance of this contract after sending the transaction
             ///
-            /// Notes:
-            /// - If there are no constructor arguments, you should pass `()` as the argument.
-            /// - The default poll duration is 7 seconds.
-            /// - The default number of confirmations is 1 block.
+            /// Deploy the contract
+            /// 'caller' is the deployer
             ///
-            ///
-            /// # Example
-            ///
-            /// Generate contract bindings with `abigen!` and deploy a new contract instance.
-            ///
-            /// *Note*: this requires a `bytecode` and `abi` object in the `greeter.json` artifact.
-            ///
-            /// ```ignore
-            /// # async fn deploy<M: ethers::providers::Middleware>(client: ::std::sync::Arc<M>) {
-            ///     abigen!(Greeter, "../greeter.json");
-            ///
-            ///    let greeter_contract = Greeter::deploy(client, "Hello world!".to_string()).unwrap().send().await.unwrap();
-            ///    let msg = greeter_contract.greet().call().await.unwrap();
-            /// # }
-            /// ```
-            // @note CHANGED
-            /*
             pub fn deploy<T: #ethers_core::abi::Tokenize>(
                 client: ::std::sync::Arc<M>,
-                constructor_args: T,
-            ) -> ::core::result::Result<#ethers_contract::builders::ContractDeployer<M, Self>, #ethers_contract::ContractError<M>> {
-                let factory = #ethers_contract::ContractFactory::new(#get_abi, #get_bytecode, client);
-                let deployer = factory.deploy(constructor_args)?;
-                let deployer = #ethers_contract::ContractDeployer::new(deployer);
-                Ok(deployer)
-            }
-            */
-
-            pub fn deploy<T: #ethers_core::abi::Tokenize>(
-                client: ::std::sync::Arc<M>,
-                caller: ::ethers::abi::Address,
+                caller: ::ethers_core::abi::Address,
                 args: T
-            ) -> eyre::Result<::ethers::abi::Address> {
+            ) -> eyre::Result<::ethers_core::abi::Address> {
                 let params = args.into_tokens();
-                let abi = ::ethers::abi::Abi::from(#get_abi);
+                let abi = ::ethers_core::abi::Abi::from(#get_abi);
                 let encoded = match abi.constructor() {
                     Some(c) => c.encode_input(#get_bytecode.to_vec().into(), &params)?,
                     _ => #get_bytecode.to_vec().into(),
@@ -682,7 +651,7 @@ fn expand_call_struct_variant_name(function: &Function, alias: Option<&MethodAli
 
 #[cfg(test)]
 mod tests {
-    use ethers::abi::ParamType;
+    use ethers_core::abi::ParamType;
 
     use super::*;
 

@@ -1,8 +1,11 @@
 //! Custom errors expansion
 
 use super::{structs::expand_struct, types, util, Context};
-use ethers::abi::{ethabi::AbiError, ErrorExt};
-use ethers::prelude::macros::{ethers_contract_crate, ethers_core_crate};
+
+use ethers_core::{
+    abi::{ethabi::AbiError, ErrorExt},
+    macros::{ethers_contract_crate, ethers_core_crate},
+};
 use eyre::Result;
 use inflector::Inflector;
 use proc_macro2::{Ident, TokenStream};

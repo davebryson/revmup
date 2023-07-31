@@ -2,11 +2,14 @@
 
 use super::{types, Context};
 use crate::util;
-use ethers::abi::{
-    struct_def::{FieldDeclaration, FieldType, StructFieldType, StructType},
-    Component, HumanReadableParser, ParamType, RawAbi, SolStruct,
+
+use ethers_core::{
+    abi::{
+        struct_def::{FieldDeclaration, FieldType, StructFieldType, StructType},
+        Component, HumanReadableParser, ParamType, RawAbi, SolStruct,
+    },
+    macros::ethers_contract_crate,
 };
-use ethers::prelude::macros::ethers_contract_crate;
 use eyre::{eyre, Result};
 use inflector::Inflector;
 use proc_macro2::TokenStream;

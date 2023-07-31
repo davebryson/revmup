@@ -3,7 +3,8 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace.dependencies]
-ethers = "2.0.8"
+ethers-core = "2.0.8"
+ethers-contract = "2.0.8"
 eyre = "0.6.8"
 revm = "3.3.0"
 hex = "0.4"

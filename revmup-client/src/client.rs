@@ -12,6 +12,7 @@ use std::cell::RefCell;
 
 use super::RevmClient;
 
+/// Generate a random address
 pub fn generate_random_account() -> ::revm::primitives::Address {
     let random_bytes = rand::thread_rng().gen::<[u8; 20]>();
     ::revm::primitives::Address::from(random_bytes)

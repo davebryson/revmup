@@ -6,7 +6,8 @@ edition = "2021"
 
 [dependencies]
 eyre = "0.6.8"
-ethers = "2.0.8"
+ethers-core = "2.0.8"
+ethers-contract = "2.0.8"
 revm = "3.3.0"
-revmup-client = {path="../../revmup-client"}
-revmup-contract = {path="../../revmup-contract"}
+revmup-client = { path = "../../revmup-client" }
+revmup-contract = { path = "../../revmup-contract" }

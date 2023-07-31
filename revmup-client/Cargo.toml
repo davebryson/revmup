@@ -5,7 +5,8 @@ edition = "2021"
 
 
 [dependencies]
-ethers-core = "2.0.8"
+ethers-core.workspace = true
 eyre.workspace = true
 revm.workspace = true
+
 rand = "0.8.5"
