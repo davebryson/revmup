@@ -1,37 +1,49 @@
+use ethers_core::utils::parse_ether;
+use revmup_client::{BasicClient, RevmClient};
+use std::sync::Arc;
+
 mod erc20;
-
 use erc20::MockErc20;
-use revmup_client::RevmClient;
 
+/// note: 'erc20' is auto generated. See: 'revmup-abigen/src/bin'
 fn main() {
-    let client = ::std::sync::Arc::new(revmup_client::BasicClient::new());
-    let amt = ::ethers_core::utils::parse_ether(3u8).unwrap();
+    // create the client
+    let client = Arc::new(BasicClient::new());
 
+    // amount to fund accounts
+    let amt = parse_ether(3u8).unwrap();
+
+    // create 2 funded accounts
     let accounts = client
         .batch_create_accounts_with_balance(2, amt)
         .expect("acccounts");
+
     let alice = accounts[0];
     let bob = accounts[1];
 
+    // Deploy the ERC20 contract
+    // bob is the deployer...
+    // and the constructor takes 3 args.
     let addy = MockErc20::deploy::<(String, String, u8)>(
         client.clone(),
         bob,
         ("hello".into(), "H".into(), 8u8),
     )
     .unwrap();
-    println!("address: {}", addy);
+    println!("contract address: {}", addy);
 
-    // instance
+    // Create an instance pointing to the contract deployed (via addy)
     let erc = MockErc20::new(addy, client.clone());
 
-    // call methods
+    // Make a read-only call
     let v = erc.name().call().unwrap();
     println!("name: {}", v);
 
-    // send tx
+    // Send a tx minting bob 2 tokens
     erc.mint(bob, 2u8.into()).send_transaction(bob).unwrap();
     // note caller (from) is bob ---------------^
 
+    // Check bob's balance
     let b = erc.balance_of(bob).call().unwrap();
     println!("bal: {:?}", b);
 
@@ -46,15 +58,16 @@ fn main() {
         .expect("parse log");
     println!("events: {:?}", tlogs);
 
-    // This will be '[]'
+    // This will be '[]' as there are no approval events on a 'transfer' call
     let alogs = erc.get_approval_filter_logs(logs).expect("parse log");
     println!("events: {:?}", alogs);
 
+    // Check erc token balances
     let u = erc.balance_of(bob).call().unwrap();
-    println!("user bal: {:?}", u);
-
     let alicebal = erc.balance_of(alice.into()).call().unwrap();
-    println!("alice bal: {:?}", alicebal);
+    println!("bob's bal: {:?}", u);
+    println!("alice's bal: {:?}", alicebal);
 
-    println!("client bal for alice: {:}", client.get_balance(alice))
+    // Check alice's eth balance
+    println!("eth bal for alice: {:}", client.get_balance(alice))
 }
