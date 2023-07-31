@@ -1,8 +1,12 @@
 [package]
 name = "revmup-client"
-version = "0.1.0"
-edition = "2021"
+authors = ["Dave Bryson <davebryson@users.noreply.github.com>"]
+readme = "README.md"
+description = "Client for interacting with REVM - a Rust based ethereum virtual machine"
 
+version.workspace = true
+edition.workspace = true
+license.workspace = true
 
 [dependencies]
 ethers-core.workspace = true

@@ -1,7 +1,12 @@
 [package]
 name = "revmup-abigen"
-version = "0.1.0"
-edition = "2021"
+authors = ["Dave Bryson <davebryson@users.noreply.github.com>"]
+readme = "README.md"
+description = "API to auto-generate ethereum contracts for use with REVM"
+
+version.workspace = true
+edition.workspace = true
+license.workspace = true
 
 [[bin]]
 name = "generate"

@@ -1,6 +1,11 @@
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/davebryson/revmup"
+homepage = "https://github.com/davebryson/revmup"
+categories = ["cryptography::cryptocurrencies"]
+keywords = ["revm", "ethereum", "web3"]
 
 [workspace.dependencies]
 ethers-core = "2.0.8"

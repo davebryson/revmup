@@ -1,8 +1,12 @@
 [package]
 name = "revmup-contract"
-version = "0.1.0"
-edition = "2021"
+authors = ["Dave Bryson <davebryson@users.noreply.github.com>"]
+readme = "README.md"
+description = "revm API for interacting with Ethereum smart contracts"
 
+version.workspace = true
+edition.workspace = true
+license.workspace = true
 
 [dependencies]
 ethers-core.workspace = true

@@ -182,7 +182,6 @@ fn main() {
 }
 
 fn clap_stuff() {
-    println!("RUNNING");
     let args = BindArgs::parse();
 
     //let artifacts = args.try_load_config_emit_warnings().unwrap().out;
