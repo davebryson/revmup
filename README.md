@@ -50,4 +50,7 @@ println!("transfer events: {:?}", log_results);
 ## Run the example
 `cargo run --bin basics`
 
+## Standing on the shoulders of giants...
+- [revm](https://github.com/bluealloy/revm)
+- [ethers-rs](https://github.com/gakonst/ethers-rs/tree/master)
 
