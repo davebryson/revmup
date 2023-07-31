@@ -1,5 +1,8 @@
-use ethers::prelude::decode_function_data;
-use ethers::{abi::Detokenize, prelude::abi::Function};
+use ethers_contract::decode_function_data;
+use ethers_core::{
+    abi::{Detokenize, Function, RawLog},
+    types::Address,
+};
 use revm::primitives::TxEnv;
 use std::{borrow::Borrow, fmt::Debug, marker::PhantomData};
 
@@ -32,10 +35,7 @@ where
         Ok(data)
     }
 
-    pub fn send_transaction(
-        &self,
-        caller: ::ethers::types::Address,
-    ) -> eyre::Result<(D, Vec<::ethers::abi::RawLog>)> {
+    pub fn send_transaction(&self, caller: Address) -> eyre::Result<(D, Vec<RawLog>)> {
         let mut t = self.tx.to_owned();
         t.caller = caller.into();
         let (bits, _, logs) = self.client.borrow().send_transaction(t)?;

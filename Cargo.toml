@@ -2,12 +2,11 @@
 version = "0.1.0"
 edition = "2021"
 
+[workspace.dependencies]
+ethers = "2.0.8"
+eyre = "0.6.8"
+revm = "3.3.0"
+hex = "0.4"
+
 [workspace]
-members = [
- "revmup-contract", 
- "revmup-client",
- "revmup-abigen",
- "examples/*",
-]
-
-
+members = ["revmup-contract", "revmup-client", "revmup-abigen", "examples/*"]

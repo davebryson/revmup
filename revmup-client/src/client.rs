@@ -1,9 +1,11 @@
+use ethers_core::{
+    abi::{Address, RawLog},
+    types::{H256, U256},
+};
 use rand::Rng;
 use revm::{
     db::{CacheDB, EmptyDB},
-    primitives::{
-        AccountInfo, ExecutionResult, Log, Output, ResultAndState, TransactTo, TxEnv, U256,
-    },
+    primitives::{AccountInfo, ExecutionResult, Log, Output, ResultAndState, TransactTo, TxEnv},
     Database, EVM,
 };
 use std::cell::RefCell;
@@ -24,7 +26,7 @@ impl BasicClient {
     pub fn new() -> Self {
         let mut evm = EVM::new();
         let db = CacheDB::new(EmptyDB {});
-        evm.env.block.gas_limit = U256::MAX;
+        evm.env.block.gas_limit = U256::max_value().into();
         evm.database(db);
         Self {
             evm: RefCell::new(evm),
@@ -33,12 +35,11 @@ impl BasicClient {
 }
 
 // convert revm Logs to ethers RawLog
-fn into_ether_raw_log(logs: Vec<Log>) -> Vec<::ethers::abi::RawLog> {
+fn into_ether_raw_log(logs: Vec<Log>) -> Vec<RawLog> {
     logs.iter()
         .map(|log| {
-            let topics: Vec<::ethers::types::H256> =
-                log.topics.iter().map(|x| x.clone().into()).collect();
-            ::ethers::abi::RawLog {
+            let topics: Vec<H256> = log.topics.iter().map(|x| x.clone().into()).collect();
+            RawLog {
                 topics,
                 data: log.clone().data.into(),
             }
@@ -47,10 +48,7 @@ fn into_ether_raw_log(logs: Vec<Log>) -> Vec<::ethers::abi::RawLog> {
 }
 
 impl RevmClient for BasicClient {
-    fn create_account_with_balance(
-        &self,
-        amount: ::ethers::types::U256,
-    ) -> eyre::Result<::ethers::types::Address> {
+    fn create_account_with_balance(&self, amount: U256) -> eyre::Result<Address> {
         let account = generate_random_account();
         let mut info = AccountInfo::default();
         info.balance = amount.into();
@@ -65,8 +63,8 @@ impl RevmClient for BasicClient {
     fn batch_create_accounts_with_balance(
         &self,
         num: u64,
-        amount: ::ethers::types::U256,
-    ) -> eyre::Result<Vec<::ethers::types::Address>> {
+        amount: U256,
+    ) -> eyre::Result<Vec<Address>> {
         let r = (0..num)
             .into_iter()
             .flat_map(|_| self.create_account_with_balance(amount).ok())
@@ -74,7 +72,7 @@ impl RevmClient for BasicClient {
         Ok(r)
     }
 
-    fn get_balance(&self, account: ::ethers::types::Address) -> ::ethers::types::U256 {
+    fn get_balance(&self, account: Address) -> U256 {
         match self
             .evm
             .borrow_mut()
@@ -83,16 +81,11 @@ impl RevmClient for BasicClient {
             .basic(account.into())
         {
             Ok(Some(account)) => account.balance.into(),
-            _ => ::ethers::types::U256::zero(),
+            _ => U256::zero(),
         }
     }
 
-    fn transfer(
-        &self,
-        to: ::ethers::types::Address,
-        from: ::ethers::types::Address,
-        amount: ::ethers::types::U256,
-    ) -> eyre::Result<()> {
+    fn transfer(&self, to: Address, from: Address, amount: U256) -> eyre::Result<()> {
         let mut tx = TxEnv::default();
         tx.caller = from.into();
         tx.transact_to = TransactTo::Call(to.into());
@@ -108,7 +101,7 @@ impl RevmClient for BasicClient {
         Ok(())
     }
 
-    fn deploy(&self, tx: TxEnv) -> eyre::Result<ethers::abi::Address> {
+    fn deploy(&self, tx: TxEnv) -> eyre::Result<Address> {
         self.evm.borrow_mut().env.tx = tx;
         let (output, _, _) = self
             .evm
@@ -139,7 +132,7 @@ impl RevmClient for BasicClient {
     fn send_transaction(
         &self,
         tx: TxEnv,
-    ) -> eyre::Result<(revm::primitives::Bytes, u64, Vec<::ethers::abi::RawLog>)> {
+    ) -> eyre::Result<(revm::primitives::Bytes, u64, Vec<RawLog>)> {
         self.evm.borrow_mut().env.tx = tx;
         match self.evm.borrow_mut().transact_commit() {
             Ok(result) => {

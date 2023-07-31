@@ -5,32 +5,33 @@ edition = "2021"
 
 [[bin]]
 name = "generate"
-path = "src/bin/genit.rs"
+path = "src/bin/gencontracts.rs"
+
+#[[bin]]
+#name = "generate"
+#path = "src/bin/genit.rs"
 
 [dependencies]
-eyre = "0.6.8"
-
-ethers = "2.0.8"
-
-hex = "0.4"
-#hex-literal = "0.4"
-
-revm = "3.3.0"
+eyre.workspace = true
+ethers.workspace = true
+hex.workspace = true
+revm.workspace = true
 
 
-# serde
 serde = "1.0"
 serde_json = "1.0"
+clap = { version = "4.3.19", features = ["derive"] }
 
 dunce = "1.0"
 Inflector = "0.11"
 regex = "1.8"
 walkdir = "2.3"
-
+toml = "0.7"
+tempfile = "3.5"
 proc-macro2 = "1.0"
 quote = "1.0"
 syn = { version = "2.0", features = ["extra-traits"] }
 prettyplease = { version = "0.2", features = ["verbatim"] }
 
-revmup-contract = { path="../revmup-contract"}
-revmup-client = {path="../revmup-client"}
+revmup-contract = { path = "../revmup-contract" }
+revmup-client = { path = "../revmup-client" }

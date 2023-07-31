@@ -1,6 +1,6 @@
 pub use mock_erc_20::*;
 /// This module was auto-generated from a customized version of ethers-rs Abigen.
-/// ethers::provider is replaced with a revm client.
+/// In this version, ethers::provider is replaced with a revm client.
 #[allow(
     clippy::enum_variant_names,
     clippy::too_many_arguments,

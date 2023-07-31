@@ -23,8 +23,8 @@ pub use contract::structs::InternalStructs;
 pub mod filter;
 pub use filter::{ContractFilter, ExcludeContracts, SelectContracts};
 
-//pub mod multi;
-//pub use multi::MultiAbigen;
+pub mod multi;
+pub use multi::MultiAbigen;
 
 mod source;
 

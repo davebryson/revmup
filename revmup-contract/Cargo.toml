@@ -5,8 +5,10 @@ edition = "2021"
 
 
 [dependencies]
-eyre = "0.6.8"
-ethers = "2.0.8"
-hex = "0.4"
-revm = "3.3.0"
-revmup-client = {path="../revmup-client"}
+ethers-core = "2.0.8"
+ethers-contract = "2.0.8"
+eyre.workspace = true
+revm.workspace = true
+hex.workspace = true
+
+revmup-client = { path = "../revmup-client" }

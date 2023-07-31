@@ -1,9 +1,9 @@
-use ethers::{
+use ethers_contract::{encode_function_data, AbiError, BaseContract};
+use ethers_core::{
     abi::{Abi, Detokenize, Error, Function, Tokenize},
-    contract::{encode_function_data, AbiError, BaseContract},
-    types::Selector,
+    types::{Address, Selector},
 };
-use revm::primitives::{Address, TransactTo, TxEnv};
+use revm::primitives::{TransactTo, TxEnv};
 use std::{borrow::Borrow, fmt::Debug, marker::PhantomData};
 
 use crate::call::FunctionCall;
@@ -55,7 +55,6 @@ where
 
     /// Returns a reference to the contract's ABI.
     pub fn abi(&self) -> &Abi {
-        // @todo changed from .abi
         &self.base_contract.abi()
     }
 
@@ -105,6 +104,7 @@ where
     B: Clone + Borrow<R>,
     R: RevmClient,
 {
+    // @todo CLEANUP
     /// Returns an [`Event`](crate::builders::Event) builder with the provided filter.
     /// REMOVE FOR NOW AS EVENT NEEDS MiddleWare
     /*
@@ -133,7 +133,7 @@ where
     }
     */
 
-    pub fn deploy(&self, tx: TxEnv) -> eyre::Result<ethers::abi::Address> {
+    pub fn deploy(&self, tx: TxEnv) -> eyre::Result<Address> {
         self.client.borrow().deploy(tx)
     }
 
