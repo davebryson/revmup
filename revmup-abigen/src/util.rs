@@ -1,14 +1,9 @@
 use crate::InternalStructs;
-//use ethers::abi::{
-//    struct_def::{FieldType, StructFieldType},
-//    ParamType, SolStruct,
-//};
 
 use ethers_core::abi::{
     struct_def::{FieldType, StructFieldType},
     ParamType, SolStruct,
 };
-
 use eyre::Result;
 use inflector::Inflector;
 use proc_macro2::{Ident, Span, TokenStream};

@@ -9,18 +9,11 @@ mod types;
 use super::{util, Abigen};
 use crate::contract::{methods::MethodAlias, structs::InternalStructs};
 
-//use ethers::prelude::macros::{ethers_contract_crate, ethers_core_crate};
-
 use ethers_core::{
     abi::{Abi, AbiParser, ErrorExt, EventExt, JsonAbi},
     macros::{ethers_contract_crate, ethers_core_crate},
     types::Bytes,
 };
-
-//use ethers::{
-//    abi::{Abi, AbiParser, ErrorExt, EventExt, JsonAbi},
-//    types::Bytes,
-//};
 
 use eyre::{eyre, Context as _, Result};
 use proc_macro2::{Ident, Literal, TokenStream};

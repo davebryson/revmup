@@ -27,15 +27,13 @@ pub mod multi;
 pub use multi::MultiAbigen;
 
 mod source;
-
 mod util;
 mod verbatim;
-//mod macro;
 
-//pub use ethers::types::Address;
 pub use ethers_core::types::Address;
-
 pub use source::Source;
+
+//pub use abigen::abigen;
 
 use contract::{Context, ExpandedContract};
 use eyre::Result;
