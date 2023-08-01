@@ -82,6 +82,8 @@ impl Context {
             })
             .collect::<Vec<Ident>>();
 
+        let name = &self.contract_ident;
+
         quote! {
             #[doc = "Container type for all of the contract's events"]
             #[derive(Clone, #ethers_contract::EthAbiType, #derives)]
@@ -89,7 +91,7 @@ impl Context {
                 #( #variants(#variants), )*
             }
 
-            impl<M: ::revmup_client::RevmClient> MockErc20<M> {
+            impl<M: ::revmup_client::RevmClient>#name<M> {
                 #(
                     pub fn #event_method_names(&self, logs: Vec<::ethers_core::abi::RawLog>) -> eyre::Result<Vec<#variants>> {
                         let e = self.abi().event(#quoted_names_str)?;

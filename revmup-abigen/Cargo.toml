@@ -9,8 +9,8 @@ edition.workspace = true
 license.workspace = true
 
 [[bin]]
-name = "generate"
-path = "src/bin/gencontracts.rs"
+name = "revmup"
+path = "src/bin/generate.rs"
 
 [dependencies]
 eyre.workspace = true

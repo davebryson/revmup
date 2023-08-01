@@ -2,10 +2,11 @@ use ethers_core::utils::parse_ether;
 use revmup_client::{BasicClient, RevmClient};
 use std::sync::Arc;
 
-mod erc20;
-use erc20::MockErc20;
+mod contract;
+use contract::erc_20::Erc20;
 
-/// note: 'erc20' is auto generated. See: 'revmup-abigen/src/bin'
+///  note: 'Erc20' was auto generated via:
+/// `revmup -i ./examples/basics/abi -o ./examples/basics/src/contract`
 fn main() {
     // create the client
     let client = Arc::new(BasicClient::new());
@@ -24,7 +25,7 @@ fn main() {
     // Deploy the ERC20 contract
     // bob is the deployer...
     // and the constructor takes 3 args.
-    let addy = MockErc20::deploy::<(String, String, u8)>(
+    let addy = Erc20::deploy::<(String, String, u8)>(
         client.clone(),
         bob,
         ("hello".into(), "H".into(), 8u8),
@@ -33,7 +34,7 @@ fn main() {
     println!("contract address: {}", addy);
 
     // Create an instance pointing to the contract deployed (via addy)
-    let erc = MockErc20::new(addy, client.clone());
+    let erc = Erc20::new(addy, client.clone());
 
     // Make a read-only call
     let v = erc.name().call().unwrap();

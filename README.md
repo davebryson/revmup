@@ -1,11 +1,11 @@
-# Revmup 
+# revmup 
 
 A smart contract and client API for [revm](https://github.com/bluealloy/revm/tree/main).
  
 Features: 
-- Auto-generate contracts from an ABI that interact directly with `revm` without needing `ethers provider`
+- Auto-generate contracts that interact directly with `revm` without needing `ethers provider`
 - Contract API is almost identical to `ethers` generated contracts  
-- Extract logs
+- Extract event logs
 
 ## Example
 ```rust

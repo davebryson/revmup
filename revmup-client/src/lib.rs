@@ -7,6 +7,10 @@ use revm::primitives::TxEnv;
 mod client;
 pub use self::client::BasicClient;
 
+/// Trait required by revm-contracts and abigen.
+///
+/// @todo maybe the trait should only require a client to implement
+/// the core functions needed by contracts and abigen (deploy, call, send_transaction)
 pub trait RevmClient {
     /// Create an account with the given amount
     fn create_account_with_balance(&self, amount: U256) -> eyre::Result<Address>;

@@ -35,7 +35,7 @@ impl BasicClient {
     }
 }
 
-// convert revm Logs to ethers RawLog
+/// convert revm Logs to ethers RawLog
 fn into_ether_raw_log(logs: Vec<Log>) -> Vec<RawLog> {
     logs.iter()
         .map(|log| {
