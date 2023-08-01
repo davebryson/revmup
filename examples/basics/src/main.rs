@@ -1,5 +1,5 @@
 use ethers_core::utils::parse_ether;
-use revmup_client::{BasicClient, RevmClient};
+use revmup_client::BasicClient;
 use std::sync::Arc;
 
 mod contract;
