@@ -7,6 +7,32 @@ Features:
 - Contract API is almost identical to `ethers` generated contracts  
 - Extract event logs
 
+## Setup
+These crates have not yet been published.  To experiment with the code you can try the following:
+
+To run the basics example:
+
+`cargo run --bin basics`
+
+To generate contracts from abi you can run:
+
+`cargo run --bin revmup -- -i INPUT_PATH_OF_ABI_SON -o OUTPUT_PATH_OF_GENERATED_CODE`
+
+For help:
+
+`cargo run --bin revmup -- --help`
+
+```text
+Generate contract bindings for revm
+
+Usage: revmup --input-path <PATH> --output-path <PATH>
+
+Options:
+  -i, --input-path <PATH>   Input path for contract artifacts/json files
+  -o, --output-path <PATH>  Output path for generated code
+  -h, --help                Print help
+```
+
 ## Example
 ```rust
 // First you auto-generate the contract code from the ABI. In this example, 
@@ -47,8 +73,6 @@ let (_, logs) = erc.transfer(alice.into(), 1u8.into()).send_transaction(bob).unw
  let log_results = erc.get_transfer_filter_logs(logs.clone()).expect("parse log");
 println!("transfer events: {:?}", log_results);
 ```
-## Run the example
-`cargo run --bin basics`
 
 ## Standing on the shoulders of giants...
 - [revm](https://github.com/bluealloy/revm)
